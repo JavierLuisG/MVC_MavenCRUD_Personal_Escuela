@@ -11,4 +11,12 @@
         <maven.compiler.target>17</maven.compiler.target>
         <exec.mainClass>com.javier.escuela.controller.MVC_MavenCRUD_Personal_Escuela</exec.mainClass>
     </properties>
+    <dependencies>
+        <!--dependencia para mysql-connector-->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.26</version>
+        </dependency>
+    </dependencies>
 </project>
