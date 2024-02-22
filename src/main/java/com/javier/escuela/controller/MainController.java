@@ -9,13 +9,17 @@ public class MainController implements ActionListener{
 
     // Probar conexión 
     
-    static PersonalView view = new PersonalView();
-    DatabaseConnection conn = DatabaseConnection.getInstance();
+    private PersonalView view; // = new PersonalView();
+    private DatabaseConnection conn; // = DatabaseConnection.getInstance();  
+
+    public MainController(PersonalView view, DatabaseConnection conn) {
+        this.view = view;
+        this.conn = conn;
+        view.btnBuscar.addActionListener(this);
+    }
     
-    public static void main(String[] args) {
-        
+    public void iniciar () {
         view.setVisible(true);
-        view.btnBuscar.addActionListener(new MainController());
     }
 
     @Override
