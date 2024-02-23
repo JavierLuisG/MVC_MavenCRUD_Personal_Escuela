@@ -6,13 +6,13 @@ import java.sql.*;
 /*
 * Se Implementa PersonalDAO donde están los métodos para el CRUD 
 * No es necesario extender de DatabaseConnection para acceder a la conexión 
-*/
-public class PersonalDAOImpl implements PersonalDAO{
+ */
+public class PersonalDAOImpl implements PersonalDAO {
 
     private Connection conn;
     private PreparedStatement ps;
     private ResultSet rs;
-    
+
     @Override
     public int insertPersonal(Personal personal) throws SQLException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
@@ -35,19 +35,15 @@ public class PersonalDAOImpl implements PersonalDAO{
                 personal.setCelular(rs.getString("celular"));
                 personal.setFechaIngreso(rs.getDate("fecha_ingreso"));
                 personal.setGenero(rs.getString("genero"));
+                rs.close(); // es conveniente cerrar el rs despues de realizada la consulta
+                ps.close(); // es conveniente cerrar el ps despues de realizada la consulta 
                 return 1;
             } else {
                 return 0;
-            }            
+            }
         } catch (SQLException ex) {
             System.err.println("Error en la conexión, " + ex);
             return 0;
-        } finally {
-            try {
-                conn.close();
-            } catch (SQLException ex) {
-                System.err.println("Error al cerrar la conexión " + ex);
-            }               
         }
     }
 

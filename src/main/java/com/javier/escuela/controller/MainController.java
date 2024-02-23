@@ -55,6 +55,7 @@ public class MainController implements ActionListener {
                 case 0 ->
                     JOptionPane.showMessageDialog(null, "No se realizo consulta");
             }
+            DatabaseConnection.getInstance().closeConnection(); // Gestionar el cierre de la conexion a la base de datos desde el Controlador
         }
     }
 }

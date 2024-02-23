@@ -7,7 +7,7 @@ import java.sql.*;
 import java.util.Properties;
 
 public class DatabaseConnection {
-   
+
     // La única instancia permitida de la clase DatabaseConnection
     private static DatabaseConnection instancia = null;
     // La conexión a la base de datos
@@ -18,29 +18,38 @@ public class DatabaseConnection {
     private InputStream inputStream;
     // La URL de conexión a la base de datos
     private String url;
-    
+
     /* Para implementar correctamente el patrón Singleton en una clase, se debe hacer el constructor de la clase privado para prevenir la creación de nuevas instancias utilizando el operador `new`. 
        Luego, se crea un método estático `getInstance()` que cree y devuelva la única instancia permitida de la clase si aún no existe, y simplemente devuelva la instancia existente en lugar de crear una nueva si ya ha sido creada. */
-    private DatabaseConnection() {}
+    private DatabaseConnection() {
+    }
 
     // El método getConnection() se encarga de obtener y devolver la conexión a la base de datos
     public Connection getConnection() {
-        try {            
+        try {
             loadPropertiesDB();
-            String driver = properties.getProperty("driver");
             String username = properties.getProperty("username");
             String password = properties.getProperty("password");
-            Class.forName(driver);
             conn = DriverManager.getConnection(url, username, password);
-        } catch (ClassNotFoundException | SQLException ex) {
+        } catch (SQLException ex) {
             System.err.println("Error, " + ex);
         }
         return conn;
     }
 
+    public void closeConnection() {
+        if (conn != null) {
+            try {
+                conn.close();
+            } catch (SQLException ex) {
+                System.err.println("No se pudo cerrar la conexión");
+            }
+        }
+    }
+
     // El método loadPropertiesDB() se encarga de cargar las propiedades de conexión desde el archivo applicationDB.properties
     private void loadPropertiesDB() {
-        try {            
+        try {
             inputStream = getClass().getClassLoader().getResourceAsStream("applicationDB.properties");
             properties.load(inputStream);
             String hostname = properties.getProperty("hostname");
