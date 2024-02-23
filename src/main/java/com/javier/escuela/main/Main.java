@@ -12,6 +12,6 @@ public class Main {
         DatabaseConnection conn = DatabaseConnection.getInstance();
         
         MainController control = new MainController(view, conn);
-        control.iniciar();
+        control.start();
     }    
 }

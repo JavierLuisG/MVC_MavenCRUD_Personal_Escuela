@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
 import java.util.Properties;
-import javax.swing.JOptionPane;
 
 public class DatabaseConnection {
    
@@ -33,19 +32,8 @@ public class DatabaseConnection {
             String password = properties.getProperty("password");
             Class.forName(driver);
             conn = DriverManager.getConnection(url, username, password);
-            if (conn != null) {
-                JOptionPane.showMessageDialog(null, "Conexión exitosa");
-            } else {
-                JOptionPane.showMessageDialog(null, "Error en conexión");
-            }
         } catch (ClassNotFoundException | SQLException ex) {
             System.err.println("Error, " + ex);
-        } finally {
-            try {
-                conn.close();
-            } catch (SQLException ex) {
-                System.err.println(ex);
-            }
         }
         return conn;
     }
