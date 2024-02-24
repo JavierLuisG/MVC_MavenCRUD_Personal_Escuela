@@ -1,7 +1,7 @@
 package com.javier.escuela.controller;
 
 import com.javier.escuela.dal.DatabaseConnection;
-import com.javier.escuela.dal.PersonalDAOImpl;
+import com.javier.escuela.dal.dao.implement.PersonalDAOImpl;
 import com.javier.escuela.model.Personal;
 import com.javier.escuela.view.PersonalView;
 import java.awt.event.ActionEvent;

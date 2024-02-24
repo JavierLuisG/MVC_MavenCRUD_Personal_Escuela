@@ -1,7 +1,10 @@
-package com.javier.escuela.dal;
+package com.javier.escuela.dal.dao.implement;
 
+import com.javier.escuela.dal.DatabaseConnection;
+import com.javier.escuela.dal.dao.PersonalDAO;
 import com.javier.escuela.model.Personal;
 import java.sql.*;
+import java.util.List;
 
 /*
 * Se Implementa PersonalDAO donde están los métodos para el CRUD 
@@ -14,7 +17,7 @@ public class PersonalDAOImpl implements PersonalDAO {
     private ResultSet rs;
 
     @Override
-    public int insertPersonal(Personal personal) throws SQLException {
+    public int insertPersonal(Personal personal) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
@@ -48,12 +51,17 @@ public class PersonalDAOImpl implements PersonalDAO {
     }
 
     @Override
-    public int updatePersonal(Personal personal) throws SQLException {
+    public int updatePersonal(Personal personal) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public int deletePersonal(Personal personal) throws SQLException {
+    public int deletePersonal(Personal personal) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public List<Personal> findAllPersonal(Personal t) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }
