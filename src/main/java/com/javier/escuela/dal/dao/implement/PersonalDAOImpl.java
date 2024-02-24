@@ -12,9 +12,11 @@ import java.util.List;
  */
 public class PersonalDAOImpl implements PersonalDAO {
 
+    final String select = "SELECT * FROM personal WHERE numero_identificacion = ?";
+
     private Connection conn;
-    private PreparedStatement ps;
-    private ResultSet rs;
+    private PreparedStatement ps = null;
+    private ResultSet rs = null;
 
     @Override
     public int insertPersonal(Personal personal) {
@@ -24,9 +26,8 @@ public class PersonalDAOImpl implements PersonalDAO {
     @Override
     public int findPersonalByNumIdentification(Personal personal) {
         conn = DatabaseConnection.getInstance().getConnection();
-        String query = "SELECT * FROM personal WHERE numero_identificacion = ?";
         try {
-            ps = conn.prepareStatement(query);
+            ps = conn.prepareStatement(select);
             ps.setString(1, personal.getNumeroIdentificacion());
             rs = ps.executeQuery();
             if (rs.next()) {
@@ -38,8 +39,6 @@ public class PersonalDAOImpl implements PersonalDAO {
                 personal.setCelular(rs.getString("celular"));
                 personal.setFechaIngreso(rs.getDate("fecha_ingreso"));
                 personal.setGenero(rs.getString("genero"));
-                rs.close(); // es conveniente cerrar el rs despues de realizada la consulta
-                ps.close(); // es conveniente cerrar el ps despues de realizada la consulta 
                 return 1;
             } else {
                 return 0;
@@ -47,6 +46,22 @@ public class PersonalDAOImpl implements PersonalDAO {
         } catch (SQLException ex) {
             System.err.println("Error en la conexión, " + ex);
             return 0;
+        } finally {
+            if (ps != null) {
+                try {
+                    ps.close(); // se cierra el ps despues de realizada la consulta, se hace en el finally porque puede que entre en el catch y no solo en el try
+                } catch (SQLException ex) {
+                    System.err.println("No se pudo cerrar el Prepared Statement");
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close(); // se cierra el rs despues de realizada la consulta, se hace en el finally porque puede que entre en el catch y no solo en el try
+                } catch (SQLException ex) {
+                    System.err.println("No se pudo cerrar el Result Set");
+                }
+            }
+            DatabaseConnection.getInstance().closeConnection(); // Gestionar el cierre de la conexion a la base de datos desde el Controlador
         }
     }
 
