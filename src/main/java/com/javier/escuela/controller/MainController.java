@@ -16,6 +16,14 @@ public class MainController implements ActionListener {
     private Personal personal;
     private PersonalDAOImpl personalDAOImpl;
 
+    private String identificacion;
+    private String nombre;
+    private String email;
+    private String direccion;
+    private String celular;
+    private Date fechaIngreso;
+    private String genero;
+
     public MainController(PersonalView view, DatabaseConnection conn) {
         // Se inicializan las instancias con el constructor
         this.view = view;
@@ -44,19 +52,32 @@ public class MainController implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         // Condición que indica cual boton está siendo ejecutado    
         if (e.getSource() == view.btnRegistrar) {
-            // IMPORTANTE. para realizar el registro primero se pasan los valores a Personal para que no sean null, no puede ser dentro del switch           
-            personal.setNumeroIdentificacion(view.cajaIdentificacion.getText().trim());
-            personal.setNombre(view.cajaNombre.getText().trim());
-            personal.setEmail(view.cajaEmail.getText().trim());
-            personal.setDireccion(view.cajaDireccion.getText().trim());
-            personal.setCelular(view.cajaCelular.getText().trim());
-            personal.setFechaIngreso(Date.valueOf(view.cajaIngreso.getText().trim()));
-            personal.setGenero(String.valueOf(view.comboGenero.getSelectedItem()));
-            switch (personalDAOImpl.insertPersonal(personal)) {
-                case 1 ->
-                    JOptionPane.showMessageDialog(null, "Registro exitoso");
-                case 0 ->
-                    JOptionPane.showMessageDialog(null, "No se realizo el registro");
+            switch (validationEnteredData()) { // switch que valida que los datos se hayan ingresado correctamente
+                case 1 -> {
+                    // IMPORTANTE. para realizar el registro primero se pasan los valores a Personal para que no sean null, no puede ser dentro del switch           
+                    personal.setNumeroIdentificacion(identificacion);
+                    personal.setNombre(nombre);
+                    personal.setEmail(email);
+                    personal.setDireccion(direccion);
+                    personal.setCelular(celular);
+                    personal.setFechaIngreso(fechaIngreso);
+                    personal.setGenero(genero);
+                    switch (personalDAOImpl.insertPersonal(personal)) { // switch que valida el metodo insertPersonal luego de enviar los valores a las variables de personal
+                        case 1 -> {
+                            JOptionPane.showMessageDialog(null, "Registro exitoso");
+                            toClean();
+                            view.cajaBuscar.setText(identificacion);
+                        }
+                        case 2 ->
+                            JOptionPane.showMessageDialog(null, "N° idetificación ya registrado");
+                        case 0 ->
+                            JOptionPane.showMessageDialog(null, "No se realizó el registro");
+                    }
+                }
+                case 2 ->
+                    JOptionPane.showMessageDialog(null, "Fecha de ingreso invalida\nSigue el formato (yyyy-mm-dd)");
+                case 3 ->
+                    JOptionPane.showMessageDialog(null, "Ingrese todos los datos solicitados");
             }
         }
         if (e.getSource() == view.btnBuscar) {
@@ -98,18 +119,21 @@ public class MainController implements ActionListener {
             switch (personalDAOImpl.deletePersonal(personal)) {
                 case 1 -> {
                     JOptionPane.showMessageDialog(null, "Registro eliminado");
-                    limpiar();
+                    toClean();
                 }
                 case 0 ->
                     JOptionPane.showMessageDialog(null, "No se eliminó registro");
             }
         }
         if (e.getSource() == view.btnLimpiar) {
-            limpiar();
+            toClean();
         }
     }
 
-    public void limpiar() {
+    /**
+     * Método para limpiar las JTextField
+     */
+    public void toClean() {
         view.cajaBuscar.setText("");
         view.cajaID.setText("");
         view.cajaIdentificacion.setText("");
@@ -119,5 +143,42 @@ public class MainController implements ActionListener {
         view.cajaCelular.setText("");
         view.cajaIngreso.setText("");
         view.comboGenero.setSelectedIndex(0);
+    }
+
+    /**
+     * IllegalArgumentException salta cuando por ejemplo, doy registrar sin
+     * tener los datos ingresados, esta excepción no se se puede capturar en
+     * PersonalDAOImpl por tal razón,
+     *
+     * @return int para verificar que los datos sean ingresados correctamente
+     */
+    public int validationEnteredData() {
+        // Pasar los valores de las cajas a las variables para verificar si cumple con todos los datos, la validación se realiza con el siguiente if
+        identificacion = view.cajaIdentificacion.getText().trim();
+        nombre = view.cajaNombre.getText().trim();
+        email = view.cajaEmail.getText().trim();
+        direccion = view.cajaDireccion.getText().trim();
+        celular = view.cajaCelular.getText().trim();
+        // El try verifica que la cajaIngreso contenga un formato Date valido
+        try {
+            fechaIngreso = Date.valueOf(view.cajaIngreso.getText().trim());
+        } catch (IllegalArgumentException ex) {
+            fechaIngreso = null;
+        }
+        genero = String.valueOf(view.comboGenero.getSelectedItem());
+        // Este if valida que todas las cajas contengan un valor, es decir que todo está bien
+        if (!identificacion.isEmpty() && !nombre.isEmpty() && !email.isEmpty()
+                && !direccion.isEmpty() && !celular.isEmpty() && fechaIngreso != null
+                && !genero.equals(personal.getComboModel().getElementAt(0))) {
+            return 1;
+            // Este else if para validar solamente la FechaIngreso cuando tiene un error y los demás datos están bien
+        } else if (!identificacion.isEmpty() && !nombre.isEmpty() && !email.isEmpty()
+                && !direccion.isEmpty() && !celular.isEmpty() && fechaIngreso == null
+                && !genero.equals(personal.getComboModel().getElementAt(0))) {
+            return 2;
+        } else {
+            // Si retorna 3 es porque faltan datos
+            return 3;
+        }
     }
 }
