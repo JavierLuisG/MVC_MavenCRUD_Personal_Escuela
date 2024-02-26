@@ -3,6 +3,7 @@ package com.javier.escuela.dal.dao.implement;
 import com.javier.escuela.dal.DatabaseConnection;
 import com.javier.escuela.dal.dao.PersonalDAO;
 import com.javier.escuela.model.Personal;
+import com.mysql.cj.jdbc.exceptions.MysqlDataTruncation;
 import java.sql.*;
 import java.util.List;
 
@@ -42,7 +43,7 @@ public class PersonalDAOImpl implements PersonalDAO {
                 return 0;
             }
         } catch (SQLIntegrityConstraintViolationException ex) {
-            return 2;        
+            return 2;
         } catch (SQLException ex) {
             System.err.println("Error en la conexión, " + ex);
             return 0;
@@ -118,6 +119,10 @@ public class PersonalDAOImpl implements PersonalDAO {
             } else {
                 return 0;
             }
+        } catch (SQLIntegrityConstraintViolationException ex) {
+            return 2;
+        } catch (MysqlDataTruncation ex) {
+            return 3;
         } catch (SQLException ex) {
             System.err.println("Error en la conexión, " + ex);
             return 0;

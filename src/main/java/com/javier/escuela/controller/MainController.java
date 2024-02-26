@@ -104,23 +104,45 @@ public class MainController implements ActionListener {
                 }
             } else {
                 JOptionPane.showMessageDialog(null, "Ingrese un N° identificación");
-                toClean();                
+                toClean();
             }
         }
         if (e.getSource() == view.btnActualizar) {
-            personal.setNumeroIdentificacion(view.cajaIdentificacion.getText().trim());
-            personal.setNombre(view.cajaNombre.getText().trim());
-            personal.setEmail(view.cajaEmail.getText().trim());
-            personal.setDireccion(view.cajaDireccion.getText().trim());
-            personal.setCelular(view.cajaCelular.getText().trim());
-            personal.setFechaIngreso(Date.valueOf(view.cajaIngreso.getText().trim()));
-            personal.setGenero(String.valueOf(view.comboGenero.getSelectedItem()));
-            switch (personalDAOImpl.updatePersonal(personal)) {
+            // Practicamente como el btnRegistrar
+            switch (validationEnteredData()) {
                 case 1 -> {
-                    JOptionPane.showMessageDialog(null, "Actualización exitosa");
+                    personal.setNumeroIdentificacion(identificacion);
+                    personal.setNombre(nombre);
+                    personal.setEmail(email);
+                    personal.setDireccion(direccion);
+                    personal.setCelular(celular);
+                    personal.setFechaIngreso(fechaIngreso);
+                    personal.setGenero(genero);
+                    switch (personalDAOImpl.updatePersonal(personal)) {
+                        case 1 -> {
+                            JOptionPane.showMessageDialog(null, "Actualización exitosa");
+                            toClean();
+                            // Mostrar los datos que han quedado después de la actualización
+                            view.cajaIdentificacion.setText(identificacion);
+                            view.cajaNombre.setText(nombre);
+                            view.cajaEmail.setText(email);
+                            view.cajaDireccion.setText(direccion);
+                            view.cajaCelular.setText(celular);
+                            view.cajaIngreso.setText(String.valueOf(fechaIngreso));
+                            view.comboGenero.setSelectedItem(genero);
+                        }
+                        case 2 ->
+                            JOptionPane.showMessageDialog(null, "N° idetificación ya registrado");
+                        case 3 ->
+                            JOptionPane.showMessageDialog(null, "Ingrese correctamente los datos solicitados");
+                        case 0 ->
+                            JOptionPane.showMessageDialog(null, "Actualización invalida");
+                    }
                 }
-                case 0 ->
-                    JOptionPane.showMessageDialog(null, "No se realizo actualización");
+                case 2 ->
+                    JOptionPane.showMessageDialog(null, "Fecha de ingreso invalida\nSigue el formato (yyyy-mm-dd)");
+                case 3 ->
+                    JOptionPane.showMessageDialog(null, "Ingrese todos los datos solicitados");
             }
         }
         if (e.getSource() == view.btnEliminar) {
