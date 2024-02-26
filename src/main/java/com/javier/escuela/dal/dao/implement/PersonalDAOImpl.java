@@ -5,6 +5,8 @@ import com.javier.escuela.dal.dao.PersonalDAO;
 import com.javier.escuela.model.Personal;
 import java.sql.*;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /*
 * Se Implementa PersonalDAO donde están los métodos para el CRUD 
@@ -17,6 +19,7 @@ public class PersonalDAOImpl implements PersonalDAO {
     final String select = "SELECT * FROM personal WHERE numero_identificacion = ?";
     final String update = "UPDATE personal SET numero_identificacion = ?, nombre = ?, email = ?, direccion = ?, "
             + "celular = ?, fecha_ingreso = ?, genero = ? WHERE idPersonal = ?";
+    final String delete = "DELETE FROM personal WHERE idPersonal = ?";
 
     private Connection conn;
     private PreparedStatement ps = null;
@@ -120,17 +123,36 @@ public class PersonalDAOImpl implements PersonalDAO {
             return 0;
         } finally {
             try {
-                ps.close();
+                ps.close(); // se cierra el ps despues de realizada la consulta, se hace en el finally porque puede que entre en el catch y no solo en el try
             } catch (SQLException ex) {
                 System.err.println("No se pudo cerrar el Prepared Statement");
             }
-            DatabaseConnection.getInstance().closeConnection();
+            DatabaseConnection.getInstance().closeConnection(); // Gestionar el cierre de la conexion a la base de datos desde el Controlador
         }
     }
 
     @Override
     public int deletePersonal(Personal personal) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        conn = DatabaseConnection.getInstance().getConnection();
+        try {
+            ps = conn.prepareStatement(delete);
+            ps.setInt(1, personal.getIdPersonal());
+            if (ps.executeUpdate() > 0) {
+                return 1;
+            } else {
+                return 0;
+            }
+        } catch (SQLException ex) {
+            System.err.println("Error en la conexión, " + ex);
+            return 0;
+        } finally {
+            try {
+                ps.close(); // se cierra el ps despues de realizada la consulta, se hace en el finally porque puede que entre en el catch y no solo en el try
+            } catch (SQLException ex) {
+                System.err.println("No se pudo cerrar el Perared Statement");
+            }
+            DatabaseConnection.getInstance().closeConnection(); // Gestionar el cierre de la conexion a la base de datos desde el Controlador
+        }
     }
 
     @Override

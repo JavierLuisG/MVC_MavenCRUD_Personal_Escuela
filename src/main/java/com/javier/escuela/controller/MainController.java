@@ -28,6 +28,7 @@ public class MainController implements ActionListener {
         view.btnBuscar.addActionListener(this);
         view.btnRegistrar.addActionListener(this);
         view.btnActualizar.addActionListener(this);
+        view.btnEliminar.addActionListener(this);
     }
 
     public void start() {
@@ -90,6 +91,16 @@ public class MainController implements ActionListener {
                 }
                 case 0 ->
                     JOptionPane.showMessageDialog(null, "No se realizo actualización");
+            }
+        }
+        if (e.getSource() == view.btnEliminar) {
+            personal.setIdPersonal(Integer.parseInt(view.cajaID.getText()));
+            switch (personalDAOImpl.deletePersonal(personal)){
+                case 1 -> {
+                    JOptionPane.showMessageDialog(null, "Registro eliminado");                    
+                }
+                case 0 ->
+                    JOptionPane.showMessageDialog(null, "No se eliminó registro");                    
             }
         }
     }
