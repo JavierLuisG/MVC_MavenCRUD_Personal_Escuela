@@ -81,21 +81,30 @@ public class MainController implements ActionListener {
             }
         }
         if (e.getSource() == view.btnBuscar) {
-            personal.setNumeroIdentificacion(view.cajaBuscar.getText());
-            switch (personalDAOImpl.findPersonalByNumIdentification(personal)) {
-                case 1 -> {
-                    view.cajaID.setText(String.valueOf(personal.getIdPersonal()));
-                    view.cajaIdentificacion.setText(personal.getNumeroIdentificacion());
-                    view.cajaNombre.setText(personal.getNombre());
-                    view.cajaEmail.setText(personal.getEmail());
-                    view.cajaDireccion.setText(personal.getDireccion());
-                    view.cajaCelular.setText(personal.getCelular());
-                    view.cajaIngreso.setText(String.valueOf(personal.getFechaIngreso()));
-                    view.comboGenero.setSelectedItem(personal.getGenero());
-                    JOptionPane.showMessageDialog(null, "Consulta exitosa");
+            String buscar = view.cajaBuscar.getText().trim();
+            if (!buscar.isEmpty()) { // if que permite saber si ingresó o no, un valor en la cajaBuscar
+                personal.setNumeroIdentificacion(view.cajaBuscar.getText().trim());
+                switch (personalDAOImpl.findPersonalByNumIdentification(personal)) {
+                    case 1 -> {
+                        view.cajaID.setText(String.valueOf(personal.getIdPersonal()));
+                        view.cajaIdentificacion.setText(personal.getNumeroIdentificacion());
+                        view.cajaNombre.setText(personal.getNombre());
+                        view.cajaEmail.setText(personal.getEmail());
+                        view.cajaDireccion.setText(personal.getDireccion());
+                        view.cajaCelular.setText(personal.getCelular());
+                        view.cajaIngreso.setText(String.valueOf(personal.getFechaIngreso()));
+                        view.comboGenero.setSelectedItem(personal.getGenero());
+                        JOptionPane.showMessageDialog(null, "Consulta exitosa");
+                    }
+                    case 0 -> {
+                        JOptionPane.showMessageDialog(null, "N° identificación no registrado");
+                        toClean();
+                        view.cajaIdentificacion.setText(buscar);
+                    }
                 }
-                case 0 ->
-                    JOptionPane.showMessageDialog(null, "No se realizo consulta");
+            } else {
+                JOptionPane.showMessageDialog(null, "Ingrese un N° identificación");
+                toClean();                
             }
         }
         if (e.getSource() == view.btnActualizar) {
