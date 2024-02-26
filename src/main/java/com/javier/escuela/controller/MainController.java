@@ -45,17 +45,16 @@ public class MainController implements ActionListener {
         // Condición que indica cual boton está siendo ejecutado    
         if (e.getSource() == view.btnRegistrar) {
             // IMPORTANTE. para realizar el registro primero se pasan los valores a Personal para que no sean null, no puede ser dentro del switch           
-            personal.setNumeroIdentificacion(view.cajaIdentificacion.getText());
-            personal.setNombre(view.cajaNombre.getText());
-            personal.setEmail(view.cajaEmail.getText());
-            personal.setDireccion(view.cajaDireccion.getText());
-            personal.setCelular(view.cajaCelular.getText());
-            personal.setFechaIngreso(Date.valueOf(view.cajaIngreso.getText()));
+            personal.setNumeroIdentificacion(view.cajaIdentificacion.getText().trim());
+            personal.setNombre(view.cajaNombre.getText().trim());
+            personal.setEmail(view.cajaEmail.getText().trim());
+            personal.setDireccion(view.cajaDireccion.getText().trim());
+            personal.setCelular(view.cajaCelular.getText().trim());
+            personal.setFechaIngreso(Date.valueOf(view.cajaIngreso.getText().trim()));
             personal.setGenero(String.valueOf(view.comboGenero.getSelectedItem()));
             switch (personalDAOImpl.insertPersonal(personal)) {
-                case 1 -> {
+                case 1 ->
                     JOptionPane.showMessageDialog(null, "Registro exitoso");
-                }
                 case 0 ->
                     JOptionPane.showMessageDialog(null, "No se realizo el registro");
             }
@@ -79,12 +78,12 @@ public class MainController implements ActionListener {
             }
         }
         if (e.getSource() == view.btnActualizar) {
-            personal.setNumeroIdentificacion(view.cajaIdentificacion.getText());
-            personal.setNombre(view.cajaNombre.getText());
-            personal.setEmail(view.cajaEmail.getText());
-            personal.setDireccion(view.cajaDireccion.getText());
-            personal.setCelular(view.cajaCelular.getText());
-            personal.setFechaIngreso(Date.valueOf(view.cajaIngreso.getText()));
+            personal.setNumeroIdentificacion(view.cajaIdentificacion.getText().trim());
+            personal.setNombre(view.cajaNombre.getText().trim());
+            personal.setEmail(view.cajaEmail.getText().trim());
+            personal.setDireccion(view.cajaDireccion.getText().trim());
+            personal.setCelular(view.cajaCelular.getText().trim());
+            personal.setFechaIngreso(Date.valueOf(view.cajaIngreso.getText().trim()));
             personal.setGenero(String.valueOf(view.comboGenero.getSelectedItem()));
             switch (personalDAOImpl.updatePersonal(personal)) {
                 case 1 -> {
@@ -96,19 +95,20 @@ public class MainController implements ActionListener {
         }
         if (e.getSource() == view.btnEliminar) {
             personal.setIdPersonal(Integer.parseInt(view.cajaID.getText()));
-            switch (personalDAOImpl.deletePersonal(personal)){
+            switch (personalDAOImpl.deletePersonal(personal)) {
                 case 1 -> {
                     JOptionPane.showMessageDialog(null, "Registro eliminado");
                     limpiar();
                 }
                 case 0 ->
-                    JOptionPane.showMessageDialog(null, "No se eliminó registro");                    
+                    JOptionPane.showMessageDialog(null, "No se eliminó registro");
             }
         }
         if (e.getSource() == view.btnLimpiar) {
             limpiar();
         }
     }
+
     public void limpiar() {
         view.cajaBuscar.setText("");
         view.cajaID.setText("");
