@@ -6,6 +6,7 @@ import com.javier.escuela.model.Personal;
 import com.javier.escuela.view.PersonalView;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Date;
 import javax.swing.JOptionPane;
 
 public class MainController implements ActionListener {
@@ -25,6 +26,7 @@ public class MainController implements ActionListener {
         view.comboGenero.setModel(personal.getComboModel());
         // Ejecutar la acción del boton
         view.btnBuscar.addActionListener(this);
+        view.btnRegistrar.addActionListener(this);
     }
 
     public void start() {
@@ -36,8 +38,25 @@ public class MainController implements ActionListener {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-        // Condición que indica cual boton está siendo ejecutado    
+    public void actionPerformed(ActionEvent e) { 
+    // Condición que indica cual boton está siendo ejecutado    
+        if (e.getSource() == view.btnRegistrar) {
+            // IMPORTANTE. para realizar el registro primero se pasan los valores a Personal para que no sean null, no puede ser dentro del switch           
+            personal.setNumeroIdentificacion(view.cajaIdentificacion.getText());
+            personal.setNombre(view.cajaNombre.getText());
+            personal.setEmail(view.cajaEmail.getText());
+            personal.setDireccion(view.cajaDireccion.getText());
+            personal.setCelular(view.cajaCelular.getText());
+            personal.setFechaIngreso(Date.valueOf(view.cajaIngreso.getText()));
+            personal.setGenero(String.valueOf(view.comboGenero.getSelectedItem()));
+            switch (personalDAOImpl.insertPersonal(personal)) {
+                case 1 -> {
+                    JOptionPane.showMessageDialog(null, "Registro exitoso");
+                }
+                case 0 ->
+                    JOptionPane.showMessageDialog(null, "No se realizo el registro");
+            }
+        }
         if (e.getSource() == view.btnBuscar) {
             personal.setNumeroIdentificacion(view.cajaBuscar.getText());
             switch (personalDAOImpl.findPersonalByNumIdentification(personal)) {
