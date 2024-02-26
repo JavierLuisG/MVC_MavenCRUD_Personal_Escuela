@@ -5,8 +5,6 @@ import com.javier.escuela.dal.dao.PersonalDAO;
 import com.javier.escuela.model.Personal;
 import java.sql.*;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /*
 * Se Implementa PersonalDAO donde están los métodos para el CRUD 

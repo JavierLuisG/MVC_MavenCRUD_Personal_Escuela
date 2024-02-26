@@ -29,6 +29,7 @@ public class MainController implements ActionListener {
         view.btnRegistrar.addActionListener(this);
         view.btnActualizar.addActionListener(this);
         view.btnEliminar.addActionListener(this);
+        view.btnLimpiar.addActionListener(this);
     }
 
     public void start() {
@@ -97,11 +98,26 @@ public class MainController implements ActionListener {
             personal.setIdPersonal(Integer.parseInt(view.cajaID.getText()));
             switch (personalDAOImpl.deletePersonal(personal)){
                 case 1 -> {
-                    JOptionPane.showMessageDialog(null, "Registro eliminado");                    
+                    JOptionPane.showMessageDialog(null, "Registro eliminado");
+                    limpiar();
                 }
                 case 0 ->
                     JOptionPane.showMessageDialog(null, "No se eliminó registro");                    
             }
         }
+        if (e.getSource() == view.btnLimpiar) {
+            limpiar();
+        }
+    }
+    public void limpiar() {
+        view.cajaBuscar.setText("");
+        view.cajaID.setText("");
+        view.cajaIdentificacion.setText("");
+        view.cajaNombre.setText("");
+        view.cajaEmail.setText("");
+        view.cajaDireccion.setText("");
+        view.cajaCelular.setText("");
+        view.cajaIngreso.setText("");
+        view.comboGenero.setSelectedIndex(0);
     }
 }
