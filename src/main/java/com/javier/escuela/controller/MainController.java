@@ -23,6 +23,12 @@ public class MainController implements ActionListener {
     private String celular;
     private Date fechaIngreso;
     private String genero;
+    
+    /**
+     * NumberFormatException salta cuando se intenta eliminar sin tener un idPersonal seleccionado,
+     * por eso se crea isSelectedRecord que permite identificar si hay o no un registro seleccionado.
+     */
+    private boolean isSelectedRecord = false;
 
     public MainController(PersonalView view, DatabaseConnection conn) {
         // Se inicializan las instancias con el constructor
@@ -95,6 +101,7 @@ public class MainController implements ActionListener {
                         view.cajaIngreso.setText(String.valueOf(personal.getFechaIngreso()));
                         view.comboGenero.setSelectedItem(personal.getGenero());
                         JOptionPane.showMessageDialog(null, "Consulta exitosa");
+                        isSelectedRecord = true;
                     }
                     case 0 -> {
                         JOptionPane.showMessageDialog(null, "N° identificación no registrado");
@@ -146,14 +153,18 @@ public class MainController implements ActionListener {
             }
         }
         if (e.getSource() == view.btnEliminar) {
-            personal.setIdPersonal(Integer.parseInt(view.cajaID.getText()));
-            switch (personalDAOImpl.deletePersonal(personal)) {
-                case 1 -> {
-                    JOptionPane.showMessageDialog(null, "Registro eliminado");
-                    toClean();
-                }
-                case 0 ->
-                    JOptionPane.showMessageDialog(null, "No se eliminó registro");
+            if (isSelectedRecord) {
+                personal.setIdPersonal(Integer.parseInt(view.cajaID.getText()));
+                switch (personalDAOImpl.deletePersonal(personal)) {
+                    case 1 -> {
+                        JOptionPane.showMessageDialog(null, "Registro eliminado");
+                        toClean();
+                    }
+                    case 0 ->
+                        JOptionPane.showMessageDialog(null, "No se eliminó registro");
+                }                
+            } else {
+                JOptionPane.showMessageDialog(null, "Para eliminar seleccione primero un N° identificación");
             }
         }
         if (e.getSource() == view.btnLimpiar) {
@@ -174,6 +185,7 @@ public class MainController implements ActionListener {
         view.cajaCelular.setText("");
         view.cajaIngreso.setText("");
         view.comboGenero.setSelectedIndex(0);
+        isSelectedRecord = false;
     }
 
     /**
