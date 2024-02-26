@@ -13,8 +13,10 @@ import java.util.List;
 public class PersonalDAOImpl implements PersonalDAO {
 
     final String insert = "INSERT INTO personal (numero_identificacion,nombre,email,direccion,celular,fecha_ingreso,genero) "
-                + "VALUES (?,?,?,?,?,?,?)";
+            + "VALUES (?,?,?,?,?,?,?)";
     final String select = "SELECT * FROM personal WHERE numero_identificacion = ?";
+    final String update = "UPDATE personal SET numero_identificacion = ?, nombre = ?, email = ?, direccion = ?, "
+            + "celular = ?, fecha_ingreso = ?, genero = ? WHERE idPersonal = ?";
 
     private Connection conn;
     private PreparedStatement ps = null;
@@ -43,7 +45,7 @@ public class PersonalDAOImpl implements PersonalDAO {
             return 0;
         } finally {
             if (ps != null) {
-                try {                
+                try {
                     ps.close(); // se cierra el ps despues de realizada la consulta, se hace en el finally porque puede que entre en el catch y no solo en el try
                 } catch (SQLException ex) {
                     System.err.println("No se pudo cerrar el Prepared Statement");
@@ -97,7 +99,33 @@ public class PersonalDAOImpl implements PersonalDAO {
 
     @Override
     public int updatePersonal(Personal personal) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        conn = DatabaseConnection.getInstance().getConnection();
+        try {
+            ps = conn.prepareStatement(update);
+            ps.setString(1, personal.getNumeroIdentificacion());
+            ps.setString(2, personal.getNombre());
+            ps.setString(3, personal.getEmail());
+            ps.setString(4, personal.getDireccion());
+            ps.setString(5, personal.getCelular());
+            ps.setDate(6, personal.getFechaIngreso());
+            ps.setString(7, personal.getGenero());
+            ps.setInt(8, personal.getIdPersonal());
+            if (ps.executeUpdate() > 0) {
+                return 1;
+            } else {
+                return 0;
+            }
+        } catch (SQLException ex) {
+            System.err.println("Error en la conexión, " + ex);
+            return 0;
+        } finally {
+            try {
+                ps.close();
+            } catch (SQLException ex) {
+                System.err.println("No se pudo cerrar el Prepared Statement");
+            }
+            DatabaseConnection.getInstance().closeConnection();
+        }
     }
 
     @Override

@@ -27,6 +27,7 @@ public class MainController implements ActionListener {
         // Ejecutar la acción del boton
         view.btnBuscar.addActionListener(this);
         view.btnRegistrar.addActionListener(this);
+        view.btnActualizar.addActionListener(this);
     }
 
     public void start() {
@@ -38,8 +39,8 @@ public class MainController implements ActionListener {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) { 
-    // Condición que indica cual boton está siendo ejecutado    
+    public void actionPerformed(ActionEvent e) {
+        // Condición que indica cual boton está siendo ejecutado    
         if (e.getSource() == view.btnRegistrar) {
             // IMPORTANTE. para realizar el registro primero se pasan los valores a Personal para que no sean null, no puede ser dentro del switch           
             personal.setNumeroIdentificacion(view.cajaIdentificacion.getText());
@@ -73,6 +74,22 @@ public class MainController implements ActionListener {
                 }
                 case 0 ->
                     JOptionPane.showMessageDialog(null, "No se realizo consulta");
+            }
+        }
+        if (e.getSource() == view.btnActualizar) {
+            personal.setNumeroIdentificacion(view.cajaIdentificacion.getText());
+            personal.setNombre(view.cajaNombre.getText());
+            personal.setEmail(view.cajaEmail.getText());
+            personal.setDireccion(view.cajaDireccion.getText());
+            personal.setCelular(view.cajaCelular.getText());
+            personal.setFechaIngreso(Date.valueOf(view.cajaIngreso.getText()));
+            personal.setGenero(String.valueOf(view.comboGenero.getSelectedItem()));
+            switch (personalDAOImpl.updatePersonal(personal)) {
+                case 1 -> {
+                    JOptionPane.showMessageDialog(null, "Actualización exitosa");
+                }
+                case 0 ->
+                    JOptionPane.showMessageDialog(null, "No se realizo actualización");
             }
         }
     }
