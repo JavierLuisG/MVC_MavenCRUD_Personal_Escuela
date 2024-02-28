@@ -5,6 +5,7 @@ import com.javier.escuela.dal.dao.PersonalDAO;
 import com.javier.escuela.model.Personal;
 import com.mysql.cj.jdbc.exceptions.MysqlDataTruncation;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /*
@@ -16,6 +17,7 @@ public class PersonalDAOImpl implements PersonalDAO {
     final String insert = "INSERT INTO personal (numero_identificacion,nombre,email,direccion,celular,fecha_ingreso,genero) "
             + "VALUES (?,?,?,?,?,?,?)";
     final String select = "SELECT * FROM personal WHERE numero_identificacion = ?";
+    final String selectAll = "SELECT * FROM personal";
     final String update = "UPDATE personal SET numero_identificacion = ?, nombre = ?, email = ?, direccion = ?, "
             + "celular = ?, fecha_ingreso = ?, genero = ? WHERE idPersonal = ?";
     final String delete = "DELETE FROM personal WHERE idPersonal = ?";
@@ -161,7 +163,39 @@ public class PersonalDAOImpl implements PersonalDAO {
     }
 
     @Override
-    public List<Personal> findAllPersonal(Personal t) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public List<Personal> findAllPersonal(Personal personal) {
+        conn = DatabaseConnection.getInstance().getConnection();
+        List<Personal> persona = new ArrayList<>();
+        try {
+            ps = conn.prepareStatement(selectAll);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                personal = new Personal(); // Necesario crear una instancia de Personal y asi asignarla al ArrayList persona por medio del método add
+                personal.setNumeroIdentificacion(rs.getString("numero_identificacion"));
+                personal.setNombre(rs.getString("nombre"));
+                personal.setEmail(rs.getString("email"));
+                personal.setCelular(rs.getString("celular"));
+                persona.add(personal);
+            }
+        } catch (SQLException ex) {
+            System.err.println("Error en la conexión, " + ex);
+        } finally {
+            if (ps != null) {
+                try {
+                    ps.close(); // es conveniente cerrar el ps despues de realizada la consulta
+                } catch (SQLException ex) {
+                    System.err.println("No se pudo cerrar el Prepared Statement");
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close(); // es conveniente cerrar el rs despues de realizada la consulta
+                } catch (SQLException ex) {
+                    System.err.println("No se pudo cerrar el Result Set");
+                }
+            }
+            DatabaseConnection.getInstance().closeConnection();
+        }
+        return persona;
     }
 }
