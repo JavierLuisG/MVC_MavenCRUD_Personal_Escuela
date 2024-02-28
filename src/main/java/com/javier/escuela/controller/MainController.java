@@ -15,7 +15,12 @@ import javax.swing.table.DefaultTableModel;
 public class MainController implements ActionListener {
 
     private PersonalView personalView;
-    private RegistrosPersonalView registrosPerView;
+    /**
+     * Se inicializa registroPerView de forma global y no al ejecutar el
+     * btnRegistros para que pueda acceder en los distintos métodos, ya que
+     * arrojaba un NullPointerException al ejecutar el btnRegresar
+     */
+    private RegistrosPersonalView registrosPerView = new RegistrosPersonalView(personalView, true);
     private DefaultTableModel tableModelRegistrosPersonal = new DefaultTableModel(); // Creación del modelo para la tabla en RegistrosPersonalView
 
     private DatabaseConnection conn;
@@ -64,7 +69,8 @@ public class MainController implements ActionListener {
     }
 
     /**
-     * Se asignan al modelo de la tabla Registros las columnas con sus nombres
+     * Se asignan al modelo de la tabla Registros las columnas con sus nombres,
+     * este método es condicional para mostrar la información que se desee
      */
     public void loadModel() {
         tableModelRegistrosPersonal.addColumn("N° identificación");
@@ -75,6 +81,7 @@ public class MainController implements ActionListener {
 
     /**
      * Método que permite comenzar la vista de RegistroPersonal
+     *
      * @param registrosPerView
      */
     public void startRegistrosPersonalView(RegistrosPersonalView registrosPerView) {
@@ -210,12 +217,14 @@ public class MainController implements ActionListener {
                 nombre = persona.getNombre();
                 email = persona.getEmail();
                 celular = persona.getCelular();
+                direccion = persona.getDireccion();
+                fechaIngreso = persona.getFechaIngreso();
+                genero = persona.getGenero();
                 // Esos valores los asigno en un vector
-                Object[] fila = {identificacion, nombre, email, celular};
+                Object[] fila = {identificacion, nombre, email, celular}; // Indicar cuales se quieren mostrar y que concuerde con la columna asignada en loadModel
                 // Agrego ese vector con los valores obtenidos en la fila de la tabla Registros
                 tableModelRegistrosPersonal.addRow(fila);
             }
-            registrosPerView = new RegistrosPersonalView(personalView, true); // Se inicializa la vista de RegistroPersonal
             startRegistrosPersonalView(registrosPerView); // Se comienzan lo vista
             registrosPerView.setVisible(true); // Se asigna visibilidad
         }

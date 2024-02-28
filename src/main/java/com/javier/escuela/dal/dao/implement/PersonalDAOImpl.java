@@ -69,14 +69,7 @@ public class PersonalDAOImpl implements PersonalDAO {
             ps.setString(1, personal.getNumeroIdentificacion());
             rs = ps.executeQuery();
             if (rs.next()) {
-                personal.setIdPersonal(rs.getInt("idPersonal"));
-                personal.setNumeroIdentificacion(rs.getString("numero_identificacion"));
-                personal.setNombre(rs.getString("nombre"));
-                personal.setEmail(rs.getString("email"));
-                personal.setDireccion(rs.getString("direccion"));
-                personal.setCelular(rs.getString("celular"));
-                personal.setFechaIngreso(rs.getDate("fecha_ingreso"));
-                personal.setGenero(rs.getString("genero"));
+                retrievePersonalData(rs, personal); // Aqui obtengo los valores de la base de datos y enviados a Personal
                 return 1;
             } else {
                 return 0;
@@ -171,10 +164,7 @@ public class PersonalDAOImpl implements PersonalDAO {
             rs = ps.executeQuery();
             while (rs.next()) {
                 personal = new Personal(); // Necesario crear una instancia de Personal y asi asignarla al ArrayList persona por medio del método add
-                personal.setNumeroIdentificacion(rs.getString("numero_identificacion"));
-                personal.setNombre(rs.getString("nombre"));
-                personal.setEmail(rs.getString("email"));
-                personal.setCelular(rs.getString("celular"));
+                retrievePersonalData(rs, personal); // Aqui obtengo los valores de la base de datos y enviados a Personal
                 persona.add(personal);
             }
         } catch (SQLException ex) {
@@ -197,5 +187,26 @@ public class PersonalDAOImpl implements PersonalDAO {
             DatabaseConnection.getInstance().closeConnection();
         }
         return persona;
+    }
+
+    /**
+     * Este método permite obtener los valores de la base de datos y enviarlos a las variables de Personal
+     *
+     * @param rs instancia que permite obtener los valores de la base de datos
+     * @param personal instancia de la clase a donde serán enviados los valores obtenidos de la base de datos
+     */
+    public void retrievePersonalData(ResultSet rs, Personal personal) {
+        try {
+            personal.setIdPersonal(rs.getInt("idPersonal"));
+            personal.setNumeroIdentificacion(rs.getString("numero_identificacion"));
+            personal.setNombre(rs.getString("nombre"));
+            personal.setEmail(rs.getString("email"));
+            personal.setDireccion(rs.getString("direccion"));
+            personal.setCelular(rs.getString("celular"));
+            personal.setFechaIngreso(rs.getDate("fecha_ingreso"));
+            personal.setGenero(rs.getString("genero"));
+        } catch (SQLException ex) {
+            System.err.println("No se obtuvieron los valores de la base de datos, " + ex);
+        }
     }
 }
