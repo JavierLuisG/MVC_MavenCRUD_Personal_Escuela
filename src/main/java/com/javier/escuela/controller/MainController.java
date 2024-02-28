@@ -191,15 +191,19 @@ public class MainController implements ActionListener {
             }
         }
         if (e.getSource() == personalView.btnEliminar) {
-            if (isSelectedRecord) {
-                personal.setIdPersonal(Integer.parseInt(personalView.cajaID.getText()));
-                switch (personalDAOImpl.deletePersonal(personal)) {
-                    case 1 -> {
-                        JOptionPane.showMessageDialog(null, "Registro eliminado");
-                        toClean();
+            if (isSelectedRecord) { // Con este if se verifica que tenga un registro buscado por medio del btnBuscar 
+                // Filtro de confirmación para eliminar registro
+                if (JOptionPane.showConfirmDialog(personalView, "¿Seguro de elimanar el registro?", 
+                        "Borrar registro",JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+                    personal.setIdPersonal(Integer.parseInt(personalView.cajaID.getText()));
+                    switch (personalDAOImpl.deletePersonal(personal)) {
+                        case 1 -> {
+                            JOptionPane.showMessageDialog(null, "Registro eliminado");
+                            toClean();
+                        }
+                        case 0 ->
+                            JOptionPane.showMessageDialog(null, "No se eliminó registro");
                     }
-                    case 0 ->
-                        JOptionPane.showMessageDialog(null, "No se eliminó registro");
                 }
             } else {
                 JOptionPane.showMessageDialog(null, "Para eliminar seleccione primero un N° identificación");
