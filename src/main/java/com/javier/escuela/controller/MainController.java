@@ -4,14 +4,20 @@ import com.javier.escuela.dal.DatabaseConnection;
 import com.javier.escuela.dal.dao.implement.PersonalDAOImpl;
 import com.javier.escuela.model.Personal;
 import com.javier.escuela.view.PersonalView;
+import com.javier.escuela.view.RegistrosPersonalView;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Date;
+import java.util.List;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 public class MainController implements ActionListener {
 
-    private PersonalView view;
+    private PersonalView personalView;
+    private RegistrosPersonalView registrosPerView;
+    private DefaultTableModel tableModelRegistrosPersonal = new DefaultTableModel(); // Creación del modelo para la tabla en RegistrosPersonalView
+
     private DatabaseConnection conn;
     private Personal personal;
     private PersonalDAOImpl personalDAOImpl;
@@ -23,41 +29,66 @@ public class MainController implements ActionListener {
     private String celular;
     private Date fechaIngreso;
     private String genero;
-    
+
     /**
-     * NumberFormatException salta cuando se intenta eliminar sin tener un idPersonal seleccionado,
-     * por eso se crea isSelectedRecord que permite identificar si hay o no un registro seleccionado.
+     * NumberFormatException salta cuando se intenta eliminar sin tener un
+     * idPersonal seleccionado, por eso se crea isSelectedRecord que permite
+     * identificar si hay o no un registro seleccionado.
      */
     private boolean isSelectedRecord = false;
 
-    public MainController(PersonalView view, DatabaseConnection conn) {
+    public MainController(PersonalView personalView, DatabaseConnection conn) {
         // Se inicializan las instancias con el constructor
-        this.view = view;
+        this.personalView = personalView;
         this.conn = conn;
         personal = new Personal();
         personalDAOImpl = new PersonalDAOImpl();
         // Se envía el comboModel que se encuentra en personal al comboGenero en la view
-        view.comboGenero.setModel(personal.getComboModel());
+        personalView.comboGenero.setModel(personal.getComboModel());
         // Ejecutar la acción del boton
-        view.btnBuscar.addActionListener(this);
-        view.btnRegistrar.addActionListener(this);
-        view.btnActualizar.addActionListener(this);
-        view.btnEliminar.addActionListener(this);
-        view.btnLimpiar.addActionListener(this);
+        personalView.btnBuscar.addActionListener(this);
+        personalView.btnRegistrar.addActionListener(this);
+        personalView.btnActualizar.addActionListener(this);
+        personalView.btnEliminar.addActionListener(this);
+        personalView.btnLimpiar.addActionListener(this);
+        personalView.btnRegistros.addActionListener(this);
+        loadModel(); // Iniciar el modelo en la tabla de RegistrosPersonalView (si se inicia dentro de startRegistrosPersonalView cada vez que se ingrese a registros se multiplican los modelos en la tabla)
     }
 
     public void start() {
-        view.setLocationRelativeTo(null); // Que se localice en el medio de la pantalla al start el programa
-        view.setTitle("Gestion del personal");
-        view.setResizable(false); // Impedir modificaciones en el tamaño 
-        view.cajaID.setVisible(false); // No es necesario la visibilidad de la cajaID
-        view.setVisible(true); // Permite la visibilidad de la ventana
+        personalView.setLocationRelativeTo(null); // Que se localice en el medio de la pantalla al start el programa
+        personalView.setTitle("Gestion del personal");
+        personalView.setResizable(false); // Impedir modificaciones en el tamaño 
+        personalView.cajaID.setVisible(false); // No es necesario la visibilidad de la cajaID
+        personalView.setVisible(true); // Permite la visibilidad de la ventana
+    }
+
+    /**
+     * Se asignan al modelo de la tabla Registros las columnas con sus nombres
+     */
+    public void loadModel() {
+        tableModelRegistrosPersonal.addColumn("N° identificación");
+        tableModelRegistrosPersonal.addColumn("Nombre");
+        tableModelRegistrosPersonal.addColumn("Email");
+        tableModelRegistrosPersonal.addColumn("Celular");
+    }
+
+    /**
+     * Método que permite comenzar la vista de RegistroPersonal
+     * @param registrosPerView
+     */
+    public void startRegistrosPersonalView(RegistrosPersonalView registrosPerView) {
+        registrosPerView.tablaRegistros.setModel(tableModelRegistrosPersonal);
+        registrosPerView.setLocationRelativeTo(null);
+        registrosPerView.setTitle("Registros del personal");
+        registrosPerView.setResizable(false);
+        registrosPerView.btnRegresar.addActionListener(this);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         // Condición que indica cual boton está siendo ejecutado    
-        if (e.getSource() == view.btnRegistrar) {
+        if (e.getSource() == personalView.btnRegistrar) {
             switch (validationEnteredData()) { // switch que valida que los datos se hayan ingresado correctamente
                 case 1 -> {
                     // IMPORTANTE. para realizar el registro primero se pasan los valores a Personal para que no sean null, no puede ser dentro del switch           
@@ -72,7 +103,7 @@ public class MainController implements ActionListener {
                         case 1 -> {
                             JOptionPane.showMessageDialog(null, "Registro exitoso");
                             toClean();
-                            view.cajaBuscar.setText(identificacion);
+                            personalView.cajaBuscar.setText(identificacion);
                         }
                         case 2 ->
                             JOptionPane.showMessageDialog(null, "N° idetificación ya registrado");
@@ -86,27 +117,27 @@ public class MainController implements ActionListener {
                     JOptionPane.showMessageDialog(null, "Ingrese todos los datos solicitados");
             }
         }
-        if (e.getSource() == view.btnBuscar) {
-            String buscar = view.cajaBuscar.getText().trim();
+        if (e.getSource() == personalView.btnBuscar) {
+            String buscar = personalView.cajaBuscar.getText().trim();
             if (!buscar.isEmpty()) { // if que permite saber si ingresó o no, un valor en la cajaBuscar
-                personal.setNumeroIdentificacion(view.cajaBuscar.getText().trim());
+                personal.setNumeroIdentificacion(personalView.cajaBuscar.getText().trim());
                 switch (personalDAOImpl.findPersonalByNumIdentification(personal)) {
                     case 1 -> {
-                        view.cajaID.setText(String.valueOf(personal.getIdPersonal()));
-                        view.cajaIdentificacion.setText(personal.getNumeroIdentificacion());
-                        view.cajaNombre.setText(personal.getNombre());
-                        view.cajaEmail.setText(personal.getEmail());
-                        view.cajaDireccion.setText(personal.getDireccion());
-                        view.cajaCelular.setText(personal.getCelular());
-                        view.cajaIngreso.setText(String.valueOf(personal.getFechaIngreso()));
-                        view.comboGenero.setSelectedItem(personal.getGenero());
+                        personalView.cajaID.setText(String.valueOf(personal.getIdPersonal()));
+                        personalView.cajaIdentificacion.setText(personal.getNumeroIdentificacion());
+                        personalView.cajaNombre.setText(personal.getNombre());
+                        personalView.cajaEmail.setText(personal.getEmail());
+                        personalView.cajaDireccion.setText(personal.getDireccion());
+                        personalView.cajaCelular.setText(personal.getCelular());
+                        personalView.cajaIngreso.setText(String.valueOf(personal.getFechaIngreso()));
+                        personalView.comboGenero.setSelectedItem(personal.getGenero());
                         JOptionPane.showMessageDialog(null, "Consulta exitosa");
                         isSelectedRecord = true;
                     }
                     case 0 -> {
                         JOptionPane.showMessageDialog(null, "N° identificación no registrado");
                         toClean();
-                        view.cajaIdentificacion.setText(buscar);
+                        personalView.cajaIdentificacion.setText(buscar);
                     }
                 }
             } else {
@@ -114,7 +145,7 @@ public class MainController implements ActionListener {
                 toClean();
             }
         }
-        if (e.getSource() == view.btnActualizar) {
+        if (e.getSource() == personalView.btnActualizar) {
             // Practicamente como el btnRegistrar
             switch (validationEnteredData()) {
                 case 1 -> {
@@ -130,13 +161,13 @@ public class MainController implements ActionListener {
                             JOptionPane.showMessageDialog(null, "Actualización exitosa");
                             toClean();
                             // Mostrar los datos que han quedado después de la actualización
-                            view.cajaIdentificacion.setText(identificacion);
-                            view.cajaNombre.setText(nombre);
-                            view.cajaEmail.setText(email);
-                            view.cajaDireccion.setText(direccion);
-                            view.cajaCelular.setText(celular);
-                            view.cajaIngreso.setText(String.valueOf(fechaIngreso));
-                            view.comboGenero.setSelectedItem(genero);
+                            personalView.cajaIdentificacion.setText(identificacion);
+                            personalView.cajaNombre.setText(nombre);
+                            personalView.cajaEmail.setText(email);
+                            personalView.cajaDireccion.setText(direccion);
+                            personalView.cajaCelular.setText(celular);
+                            personalView.cajaIngreso.setText(String.valueOf(fechaIngreso));
+                            personalView.comboGenero.setSelectedItem(genero);
                         }
                         case 2 ->
                             JOptionPane.showMessageDialog(null, "N° idetificación ya registrado");
@@ -152,9 +183,9 @@ public class MainController implements ActionListener {
                     JOptionPane.showMessageDialog(null, "Ingrese todos los datos solicitados");
             }
         }
-        if (e.getSource() == view.btnEliminar) {
+        if (e.getSource() == personalView.btnEliminar) {
             if (isSelectedRecord) {
-                personal.setIdPersonal(Integer.parseInt(view.cajaID.getText()));
+                personal.setIdPersonal(Integer.parseInt(personalView.cajaID.getText()));
                 switch (personalDAOImpl.deletePersonal(personal)) {
                     case 1 -> {
                         JOptionPane.showMessageDialog(null, "Registro eliminado");
@@ -162,13 +193,34 @@ public class MainController implements ActionListener {
                     }
                     case 0 ->
                         JOptionPane.showMessageDialog(null, "No se eliminó registro");
-                }                
+                }
             } else {
                 JOptionPane.showMessageDialog(null, "Para eliminar seleccione primero un N° identificación");
             }
         }
-        if (e.getSource() == view.btnLimpiar) {
+        if (e.getSource() == personalView.btnLimpiar) {
             toClean();
+        }
+        if (e.getSource() == personalView.btnRegistros) {
+            List<Personal> list = personalDAOImpl.findAllPersonal(personal); // Obtengo la lista generada en findAllPersonal
+            tableModelRegistrosPersonal.setRowCount(0); // Este método fija desde donde se comienza indicando la fila, en este caso desde 0 que es el comienzo
+            for (Personal persona : list) { // recorro la lista generada en findAllPersonal
+                // Obtengo los valores ya generados en Personal
+                identificacion = persona.getNumeroIdentificacion();
+                nombre = persona.getNombre();
+                email = persona.getEmail();
+                celular = persona.getCelular();
+                // Esos valores los asigno en un vector
+                Object[] fila = {identificacion, nombre, email, celular};
+                // Agrego ese vector con los valores obtenidos en la fila de la tabla Registros
+                tableModelRegistrosPersonal.addRow(fila);
+            }
+            registrosPerView = new RegistrosPersonalView(personalView, true); // Se inicializa la vista de RegistroPersonal
+            startRegistrosPersonalView(registrosPerView); // Se comienzan lo vista
+            registrosPerView.setVisible(true); // Se asigna visibilidad
+        }
+        if (e.getSource() == registrosPerView.btnRegresar) {
+            registrosPerView.dispose();
         }
     }
 
@@ -176,15 +228,15 @@ public class MainController implements ActionListener {
      * Método para limpiar las JTextField
      */
     public void toClean() {
-        view.cajaBuscar.setText("");
-        view.cajaID.setText("");
-        view.cajaIdentificacion.setText("");
-        view.cajaNombre.setText("");
-        view.cajaEmail.setText("");
-        view.cajaDireccion.setText("");
-        view.cajaCelular.setText("");
-        view.cajaIngreso.setText("");
-        view.comboGenero.setSelectedIndex(0);
+        personalView.cajaBuscar.setText("");
+        personalView.cajaID.setText("");
+        personalView.cajaIdentificacion.setText("");
+        personalView.cajaNombre.setText("");
+        personalView.cajaEmail.setText("");
+        personalView.cajaDireccion.setText("");
+        personalView.cajaCelular.setText("");
+        personalView.cajaIngreso.setText("");
+        personalView.comboGenero.setSelectedIndex(0);
         isSelectedRecord = false;
     }
 
@@ -197,18 +249,18 @@ public class MainController implements ActionListener {
      */
     public int validationEnteredData() {
         // Pasar los valores de las cajas a las variables para verificar si cumple con todos los datos, la validación se realiza con el siguiente if
-        identificacion = view.cajaIdentificacion.getText().trim();
-        nombre = view.cajaNombre.getText().trim();
-        email = view.cajaEmail.getText().trim();
-        direccion = view.cajaDireccion.getText().trim();
-        celular = view.cajaCelular.getText().trim();
+        identificacion = personalView.cajaIdentificacion.getText().trim();
+        nombre = personalView.cajaNombre.getText().trim();
+        email = personalView.cajaEmail.getText().trim();
+        direccion = personalView.cajaDireccion.getText().trim();
+        celular = personalView.cajaCelular.getText().trim();
         // El try verifica que la cajaIngreso contenga un formato Date valido
         try {
-            fechaIngreso = Date.valueOf(view.cajaIngreso.getText().trim());
+            fechaIngreso = Date.valueOf(personalView.cajaIngreso.getText().trim());
         } catch (IllegalArgumentException ex) {
             fechaIngreso = null;
         }
-        genero = String.valueOf(view.comboGenero.getSelectedItem());
+        genero = String.valueOf(personalView.comboGenero.getSelectedItem());
         // Este if valida que todas las cajas contengan un valor, es decir que todo está bien
         if (!identificacion.isEmpty() && !nombre.isEmpty() && !email.isEmpty()
                 && !direccion.isEmpty() && !celular.isEmpty() && fechaIngreso != null
