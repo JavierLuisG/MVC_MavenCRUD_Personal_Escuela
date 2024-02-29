@@ -57,6 +57,7 @@ public class MainController implements ActionListener {
         personalView.btnEliminar.addActionListener(this);
         personalView.btnLimpiar.addActionListener(this);
         personalView.btnRegistros.addActionListener(this);
+        personalView.menuSalir.addActionListener(this);
         loadModel(); // Iniciar el modelo en la tabla de RegistrosPersonalView (si se inicia dentro de startRegistrosPersonalView cada vez que se ingrese a registros se multiplican los modelos en la tabla)
     }
 
@@ -231,6 +232,9 @@ public class MainController implements ActionListener {
             }
             startRegistrosPersonalView(registrosPerView); // Se comienzan lo vista
             registrosPerView.setVisible(true); // Se asigna visibilidad
+        }
+        if (e.getSource() == personalView.menuSalir) {
+            System.exit(0);
         }
         if (e.getSource() == registrosPerView.btnRegresar) {
             registrosPerView.dispose();
