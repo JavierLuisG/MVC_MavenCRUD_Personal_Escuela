@@ -176,6 +176,9 @@ public class MainController implements ActionListener {
                             personalView.cajaCelular.setText(celular);
                             personalView.cajaIngreso.setText(String.valueOf(fechaIngreso));
                             personalView.comboGenero.setSelectedItem(genero);
+                            
+                            personalView.cajaID.setText(String.valueOf(personal.getIdPersonal())); // Se envía el valor a la cajaID para eliminar, debido al toClean que la puso ""
+                            isSelectedRecord = true; // Para poder eliminar después de actualizar
                         }
                         case 2 ->
                             JOptionPane.showMessageDialog(null, "N° idetificación ya registrado");
