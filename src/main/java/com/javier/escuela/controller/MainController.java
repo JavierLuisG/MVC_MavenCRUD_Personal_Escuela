@@ -8,6 +8,8 @@ import com.javier.escuela.view.RegistrosPersonalView;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -278,7 +280,7 @@ public class MainController implements ActionListener {
         celular = personalView.cajaCelular.getText().trim();
         // El try verifica que la cajaIngreso contenga un formato Date valido
         try {
-            fechaIngreso = Date.valueOf(personalView.cajaIngreso.getText().trim());
+            fechaIngreso = validationDateEntry(personalView.cajaIngreso.getText().trim());
         } catch (IllegalArgumentException ex) {
             fechaIngreso = null;
         }
@@ -297,5 +299,26 @@ public class MainController implements ActionListener {
             // Si retorna 3 es porque faltan datos
             return 3;
         }
+    }
+    
+    /**
+     * @param fechaIngreso el valor que se obtiene de la cajaIngreso.getText()
+     * @return Date ya sea la fecha actual o la ingresada por el usuario
+     */
+    public Date validationDateEntry(String fechaIngreso) {
+        if (!fechaIngreso.isEmpty()) {
+            return Date.valueOf(fechaIngreso);
+        } else {
+            return Date.valueOf(currentDate());
+        }
+    }
+    
+    /**
+     * Método que permite obtener la fecha actual 
+     */
+    public String currentDate() {
+        LocalDate fechaActual = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        return fechaActual.format(formatter);
     }
 }
