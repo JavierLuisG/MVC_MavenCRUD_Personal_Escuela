@@ -46,6 +46,8 @@ public class PersonalDAOImpl implements PersonalDAO {
             }
         } catch (SQLIntegrityConstraintViolationException ex) {
             return 2;
+        } catch (MysqlDataTruncation ex) {
+            return 3;
         } catch (SQLException ex) {
             System.err.println("Error en la conexión, " + ex);
             return 0;

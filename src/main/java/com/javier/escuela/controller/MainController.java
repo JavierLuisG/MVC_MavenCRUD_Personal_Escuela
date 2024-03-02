@@ -115,6 +115,8 @@ public class MainController implements ActionListener {
                         }
                         case 2 ->
                             JOptionPane.showMessageDialog(null, "N° idetificación ya registrado");
+                        case 3 ->
+                            JOptionPane.showMessageDialog(null, "Ingrese correctamente los valores");
                         case 0 ->
                             JOptionPane.showMessageDialog(null, "No se realizó el registro");
                     }
